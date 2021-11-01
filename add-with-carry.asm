@@ -16,5 +16,27 @@ sta high_byte   ; store in high byte
 		            ; hight byte should now be 01
 		            ; low byte should now be 04
 		            ; $01 + $04 = $0104 = 260 
-brk			
+brk		
 
+; ============================================================
+
+; example code of program that branches on
+; carry clear (bcc)
+
+lda #$FF
+ldx #$00
+inc:
+  sta $0201, x
+  adc #$05	; add 5 resulting in carry
+  bcc res	; 2nd iteration will clear carry
+  inx
+  jmp inc
+
+res:
+  ; $0200 should hold value 0a (10). 
+  ; first carry resulted in A rolling over to 4
+  ; with carry flag set
+  ; next adc added 5 + 1 to a register -> 10
+  sta $0200
+  brk
+  
