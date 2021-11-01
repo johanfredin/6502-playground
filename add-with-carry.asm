@@ -40,3 +40,22 @@ res:
   sta $0200
   brk
   
+; ====================================================  
+; example code of program that branches on
+; carry set(bcs)
+
+clc
+lda #$01
+inc:
+  sta $0200, x  ; traverse memory (for fun)
+  adc #$01      ; add 1 to a
+  bcs res	; branch to res when carry set
+  inx
+  jmp inc
+
+res:
+  ; 1 in carry + FE = FF
+  adc #$FE 
+  sta $0200
+  brk
+  
