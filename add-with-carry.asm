@@ -59,3 +59,27 @@ res:
   sta $0200
   brk
   
+; =================================================  
+; Indirect addressing (broken example)
+; =================================================
+
+; Store the values 10 and 11 at location 16, 17
+LDA #$0a
+STA $0101
+LDA #$0b
+STA $0102
+
+; Store the pointers to values at location 16, 17
+; To memory locations 00, 01
+LDA #$01
+STA $01
+LDA #$01
+STA $02 
+
+
+LDX #$01 	; Clear X register
+LDA ($01, X) 	; Dereference ponter at location 00 (offset = 0), A should now be=0a 
+INX
+LDA ($01, X) 	; Dereference ponter at location 01 (offset = 1), A should now be=0b 
+
+brk		; exit
