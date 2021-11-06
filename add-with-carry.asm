@@ -60,7 +60,7 @@ res:
   brk
   
 ; =================================================  
-; Indirect addressing (broken example)
+; Indirect addressing
 ; =================================================
 
 ; Store the value 10 at location $0201
