@@ -63,23 +63,19 @@ res:
 ; Indirect addressing (broken example)
 ; =================================================
 
-; Store the values 10 and 11 at location 16, 17
+; Store the value 10 at location $0201
 LDA #$0a
-STA $0101
-LDA #$0b
-STA $0102
+STA $0201
 
-; Store the pointers to values at location 16, 17
-; To memory locations 00, 01
-LDA #$01
-STA $01
-LDA #$01
-STA $02 
+; Store a pointer to address $0201 at memory locations $01, $02
+LDA #$01 
+STA $01		; low byte
+LDA #$02
+STA $02		; high byte
 
-
-LDX #$01 	; Clear X register
-LDA ($01, X) 	; Dereference ponter at location 00 (offset = 0), A should now be=0a 
-INX
-LDA ($01, X) 	; Dereference ponter at location 01 (offset = 1), A should now be=0b 
-
+LDX #$01 	; set X to 1
+LDA ($00, X) 	; dereference pointer at location 01 (offset = 1), A should now be=0a 
+		; because when placing the 2 bytes (01, 02) with high byte first
+		; we end up with val $0201, e.g the adress of value $0a
 brk		; exit
+
