@@ -1,62 +1,91 @@
-define keypressed   $ff 
-define key_up       $77
-define key_down     $73
-define key_left     $61
-define key_right    $64
+    define keypressed   $ff 
+    define key_up       $77
+    define key_down     $73
+    define key_left     $61
+    define key_right    $64
 
-define white_pixel $01
-define blank $0
-define top_grid $200
-define upper_mid_grid $300
-define lower_mid_grid $400
-define bottom_grid $500
+    define white_pixel  $01
+    define blank        $00
 
-; Display pixel 
-ldx #white_pixel
-ldy #$0
-
-main:
-    stx top_grid, y
-    lda keypressed
-    cmp #key_left
-    beq move_left
-    cmp #key_right
-    beq move_right
-    jmp main
-
-move_right:
-    ; clear current pos
-    ldx #blank
-    ; increment pos by 1
-    iny
-    ; Load white pixel into x
-    ldx #white_pixel
-    ; Display white pixel at new position
-    stx top_grid, y 
-    ; Return to main loop
-    jmp main
-
-move_left:
-    jmp main
+    define pos_l        $00       ; position low byte
+    define pos_h        $01       ; position high byte
 
 
-;Memory location $fe contains a new random byte on every instruction.
-;Memory location $ff contains the ascii code of the last key pressed.
-;Memory locations $200 to $5ff map to the screen pixels. Different values will draw different colour pixels. The colours are:
-;
-;    $0: Black
-;    $1: White
-;    $2: Red
-;    $3: Cyan
-;    $4: Purple
-;    $5: Green
-;    $6: Blue
-;    $7: Yellow
-;    $8: Orange
-;    $9: Brown
-;    $a: Light red
-;    $b: Dark grey
-;    $c: Grey
-;    $d: Light green
-;    $e: Light blue
-;    $f: Light grey
+    jsr init 
+    jsr main
+
+    ; Load values 00 and 02 into memory locations 00 and 01
+    ; these values will equal memory address $0200 when using
+    ; indirect address to memory location $00
+    ; also set Y register to hold value $10
+    init:
+        lda #$00
+        sta pos_l
+        lda #$02
+        sta pos_h
+        ldy #$10
+        rts
+
+    main:
+        ; display
+        lda #white_pixel    ; load a random color into a register
+        sta (pos_l), y     ; store the white pixel at indirect location 00 with y offset. This points to address 0200
+        
+        ; check input
+        ldx keypressed
+        cpx #key_left
+            beq move_left
+        cpx #key_right
+            beq move_right
+        jmp main
+
+    move_left:
+        ; clear current pos
+        lda #blank
+        sta (pos_l), y 
+        dey
+        ; clear last key pressed
+        ldx #$0 
+        stx keypressed
+        rts
+
+    move_right:
+        ; clear current pos
+        lda #blank
+        sta (pos_l), y 
+        iny
+        ; clear last key pressed
+        ldx #$0 
+        stx keypressed
+        rts
+
+    move_down:
+        adc #$20
+        bcs handle_newline_down
+
+    move_up:
+        sbc #$20
+        bcs handle_newline_up
+
+    handle_newline_up:
+        dec pos_h          ; decrement value at memory location 01 by 1. This will tranfer us from 300 to 300 etc without rolling back
+        ldx #$00
+        stx pos_l          ; clear whatever is at memory location 00
+        clc                ; clear carry flag
+        jmp main
+
+    handle_newline_down:
+        inc pos_h          ; increment value at memory location 01 by 1. This will tranfer us from 200 to 300 etc without rolling back
+        ldx #$00
+        stx pos_l          ; clear whatever is at memory location 00
+        clc                ; clear carry flag
+        jmp main
+
+    clear_display:
+           
+        
+        rts
+        
+    display:
+        
+        rts
