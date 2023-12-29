@@ -13,6 +13,9 @@ define clr_purple   $04
 define clr_green    $05
 define clr_blue     $06
 
+; store x offset at addr 03
+define x_pos        $03 
+
 jsr init 
 jsr main
 
@@ -35,9 +38,13 @@ init:
     rts
 
 main:
+    tya
+    and #$1f
+    sta x_pos
+
     lda #white_pixel 
     sta (pos_l), y   
-    
+
     ldx keypressed
     cpx #key_left
         beq move_left
@@ -51,6 +58,10 @@ main:
 
 
 move_left:
+    lda x_pos
+    cmp #$00
+    beq main
+
     lda #blank
     sta (pos_l), y 
     dey
@@ -59,6 +70,10 @@ move_left:
     jmp main
 
 move_right:
+    lda x_pos
+    cmp #$1f
+    beq main
+
     lda #blank
     sta (pos_l), y 
     iny
@@ -67,6 +82,12 @@ move_right:
     jmp main
 
 move_down:
+    ; check if we hit bottom
+    ;lda pos_h
+    ;adc pos_l
+    ;cmp #$e5
+    ;beq main
+
     lda #blank
     sta (pos_l), y
     lda pos_l
@@ -79,6 +100,12 @@ move_down:
 
 
 move_up:
+    ; check if we hit top
+    ldx pos_h
+    lda (pos_l), x
+    cmp #$02
+    beq main
+
     lda #blank
     sta (pos_l), y
     lda pos_l
