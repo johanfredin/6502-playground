@@ -13,6 +13,12 @@ define clr_purple   $04
 define clr_green    $05
 define clr_blue     $06
 
+define top_bound    $02
+define bottom_bound $e5
+
+define screen_w     $1f
+define line_w       $20
+
 ; store x offset at addr 03
 define x_pos        $03 
 
@@ -39,7 +45,7 @@ init:
 
 main:
     tya
-    and #$1f
+    and #screen_w
     sta x_pos
 
     lda #white_pixel 
@@ -82,16 +88,17 @@ move_right:
     jmp main
 
 move_down:
-    ; check if we hit bottom
-    ;lda pos_h
-    ;adc pos_l
-    ;cmp #$e5
-    ;beq main
+    ; check for collision
+    clc
+    lda pos_h
+    adc pos_l
+    cmp #bottom_bound
+    beq main
 
     lda #blank
     sta (pos_l), y
     lda pos_l
-    adc #$1f
+    adc #$20
     	bcs next_buffer
     sta pos_l
     ldx #$0 
@@ -100,10 +107,11 @@ move_down:
 
 
 move_up:
-    ; check if we hit top
-    ldx pos_h
-    lda (pos_l), x
-    cmp #$02
+    ; check for collision
+    clc
+    lda pos_h
+    adc pos_l
+    cmp #top_bound
     beq main
 
     lda #blank
@@ -111,7 +119,7 @@ move_up:
     lda pos_l
     cmp #$00
     beq prev_buffer
-    sbc #$20
+    sbc #line_w
     sta pos_l
     ldx #$0 
     stx keypressed
