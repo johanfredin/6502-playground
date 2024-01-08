@@ -1,0 +1,15 @@
+Output dir: /home/johan/IdeaProjects/private/6502-playground/c64/bin
+parsing
+flex pass 1
+flex pass 2
+flex pass 3
+Output pass
+Writing prg file: print_chars.prg
+
+Memory Map
+----------
+Default-segment:
+  $0801-$080c Basic
+  $080e-$0829 Basic End
+  $2000-$1fff Unnamed
+
