@@ -19,9 +19,6 @@ define bottom_bound $e5
 define screen_w     $1f
 define line_w       $20
 
-; store x offset at addr 03
-define x_pos        $03 
-
 jsr init 
 jsr main
 
@@ -44,10 +41,6 @@ init:
     rts
 
 main:
-    tya
-    and #screen_w
-    sta x_pos
-
     lda #white_pixel 
     sta (pos_l), y   
 
@@ -64,27 +57,21 @@ main:
 
 
 move_left:
-    lda x_pos
-    cmp #$00
+    cpy #$00
     beq main
 
-    lda #blank
-    sta (pos_l), y 
+    jsr clear_current_pos 
     dey
-    ldx #$0 
-    stx keypressed
+    jsr clear_key_pressed
     jmp main
 
 move_right:
-    lda x_pos
-    cmp #$1f
+    cpy #$1f
     beq main
 
-    lda #blank
-    sta (pos_l), y 
+    jsr clear_current_pos
     iny
-    ldx #$0 
-    stx keypressed
+    jsr clear_key_pressed
     jmp main
 
 move_down:
@@ -95,14 +82,12 @@ move_down:
     cmp #bottom_bound
     beq main
 
-    lda #blank
-    sta (pos_l), y
+    jsr clear_current_pos
     lda pos_l
     adc #$20
     	bcs next_buffer
     sta pos_l
-    ldx #$0 
-    stx keypressed
+    jsr clear_key_pressed
     jmp main
 
 
@@ -114,15 +99,13 @@ move_up:
     cmp #top_bound
     beq main
 
-    lda #blank
-    sta (pos_l), y
+    jsr clear_current_pos
     lda pos_l
     cmp #$00
     beq prev_buffer
     sbc #line_w
     sta pos_l
-    ldx #$0 
-    stx keypressed
+    jsr clear_key_pressed
     jmp main
 
 next_buffer:
@@ -142,3 +125,13 @@ prev_buffer:
     sta pos_l
     clc
     jmp main    
+
+clear_current_pos:
+    lda #blank
+    sta (pos_l), y
+    rts
+
+clear_key_pressed:
+    ldx #0
+    stx keypressed
+    rts
