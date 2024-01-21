@@ -46,14 +46,16 @@ main:
 
     ldx keypressed
     cpx #key_left
-        beq move_left
+    beq move_left
     cpx #key_right
-        beq move_right
+    beq move_right
     cpx #key_down
-        beq move_down
+    beq move_down
     cpx #key_up
-        beq move_up
+    beq move_up
     jmp main
+
+
 
 
 move_left:

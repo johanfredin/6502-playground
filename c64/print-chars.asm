@@ -36,7 +36,7 @@ intro_loop:
     inx
     jmp intro_loop
 get_input:
-    jsr chrin
+    jsr chrin   
     cmp #$00
     beq get_input
     cmp #stop_key
